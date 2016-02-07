@@ -1,4 +1,10 @@
-package com.mentat.onlineshop.web.servlet.user;
+package ru.onlineshop.servlet.user;
+
+import ru.onlineshop.dao.DAOException;
+import ru.onlineshop.domain.ShopManager;
+import ru.onlineshop.domain.exception.AuthorizationException;
+import ru.onlineshop.domain.order.OrderLine;
+import ru.onlineshop.servlet.ShopManagerHandler;
 
 import java.io.IOException;
 
@@ -8,11 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.mentat.onlineshop.dao.DAOException;
-import com.mentat.onlineshop.domain.ShopManager;
-import com.mentat.onlineshop.domain.exception.AuthorizationException;
-import com.mentat.onlineshop.domain.order.OrderLine;
-import com.mentat.onlineshop.web.servlet.ShopManagerHandler;
 
 @WebServlet("/ShoppingCartManager")
 public class ShoppingCartManager extends HttpServlet {

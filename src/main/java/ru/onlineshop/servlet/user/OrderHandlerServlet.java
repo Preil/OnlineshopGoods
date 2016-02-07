@@ -1,4 +1,13 @@
-package com.mentat.onlineshop.web.servlet.user;
+package ru.onlineshop.servlet.user;
+
+import ru.onlineshop.dao.DAOException;
+import ru.onlineshop.domain.ShopManager;
+import ru.onlineshop.domain.exception.AuthorizationException;
+import ru.onlineshop.domain.exception.EmptyCartException;
+import ru.onlineshop.domain.exception.NoOrderFoundException;
+import ru.onlineshop.domain.exception.OpenOrderException;
+import ru.onlineshop.domain.order.ShippingType;
+import ru.onlineshop.servlet.ShopManagerHandler;
 
 import java.io.IOException;
 
@@ -8,27 +17,20 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.mentat.onlineshop.dao.DAOException;
-import com.mentat.onlineshop.domain.ShopManager;
-import com.mentat.onlineshop.domain.exception.AuthorizationException;
-import com.mentat.onlineshop.domain.exception.EmptyCartException;
-import com.mentat.onlineshop.domain.exception.NoOrderFoundException;
-import com.mentat.onlineshop.domain.exception.OpenOrderException;
-import com.mentat.onlineshop.domain.order.ShippingType;
-import com.mentat.onlineshop.web.servlet.ShopManagerHandler;
 
 @WebServlet("/order")
 public class OrderHandlerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
 		String shippingTypeString = request.getParameter("shippingtype");
 		String deliveryAddressString = request.getParameter("deliveryaddress");
 		String orderActionString = request.getParameter("orderaction");
 		int shopManagerId = (Integer) request.getSession().getAttribute("shopmanagerid");
 		ShopManager shopManager = ShopManagerHandler.getShopManagerById(shopManagerId);
+
 		try {
 			if (orderActionString.equals("create")) {
 				shopManager.createOrder(deliveryAddressString, ShippingType.valueOf(shippingTypeString.toUpperCase()));

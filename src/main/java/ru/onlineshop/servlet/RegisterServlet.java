@@ -1,24 +1,25 @@
-package com.mentat.onlineshop.web.servlet;
+package ru.onlineshop.servlet;
 
-import java.io.IOException;
+import ru.onlineshop.dao.DAOException;
+import ru.onlineshop.domain.ShopManager;
+import ru.onlineshop.domain.ShopManagerImpl;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
-import com.mentat.onlineshop.dao.DAOException;
-import com.mentat.onlineshop.domain.ShopManager;
-import com.mentat.onlineshop.domain.ShopManagerImpl;
 
+@WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		if (null == request.getParameter("firstname") || null == request.getParameter("lastname")
-				|| null == request.getParameter("login") || null == request.getParameter("password")) {
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		if (null == request.getParameter("firstname") || null == request.getParameter("lastname") || null == request.getParameter("login") || null == request.getParameter("password")) {
 			getServletContext().getRequestDispatcher("/register.jsp").forward(request, response);
 			return;
 		}

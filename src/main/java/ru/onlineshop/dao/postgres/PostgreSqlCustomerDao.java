@@ -42,8 +42,7 @@ public class PostgreSqlCustomerDao implements CustomerDao {
 					resultSet = preparedStatement.getGeneratedKeys();
 					resultSet.next();
 					log.trace("Create customer to return");
-					customer = new Customer(resultSet.getString("login"), resultSet.getString("password"),
-							resultSet.getString("name"), resultSet.getString("email"));
+					customer = new Customer(resultSet.getString("login"), resultSet.getString("password"), resultSet.getString("name"), resultSet.getString("email"));
 					customer.setAddress(resultSet.getString("address"));
 					customer.setPhone(resultSet.getString("phone"));
 					customer.setCreditCardInfo(resultSet.getString("credit_card"));
@@ -51,7 +50,9 @@ public class PostgreSqlCustomerDao implements CustomerDao {
 					log.info("Customer with login=" + login + " created!");
 				} finally {
 					try {
-						resultSet.close();
+                        if (resultSet != null) {
+                            resultSet.close();
+                        }
 						log.trace("result set closed");
 					} catch (SQLException e) {
 						log.warn("Cannot close result set", e);

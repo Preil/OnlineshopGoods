@@ -1,9 +1,9 @@
-package com.mentat.onlineshop.web.servlet;
+package ru.onlineshop.servlet;
 
+import ru.onlineshop.domain.ShopManager;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.mentat.onlineshop.domain.ShopManager;
 
 public class ShopManagerHandler {
 	private static Set<ShopManager> activeShopManagers = new HashSet<ShopManager>();
