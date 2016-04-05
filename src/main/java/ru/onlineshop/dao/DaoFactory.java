@@ -9,7 +9,6 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import ru.onlineshop.dao.postgres.*;
 
-
 public class DaoFactory {
 	private static DaoFactory daoFactory;
 	private static String type;

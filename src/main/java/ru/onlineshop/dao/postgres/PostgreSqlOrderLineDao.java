@@ -31,7 +31,6 @@ public class PostgreSqlOrderLineDao implements OrderLineDao {
 		try {
 			log.trace("Open connection");
 			connection = daoFactory.getConnection();
-			try {
 				log.trace("Create prepared statement");
 				preparedStatement = connection.prepareStatement(sql);
 				preparedStatement.setInt(1, orderId);
@@ -39,24 +38,12 @@ public class PostgreSqlOrderLineDao implements OrderLineDao {
 				preparedStatement.setInt(3, amount);
 				preparedStatement.executeUpdate();
 				log.trace("OrderLine for order=" + orderId + " created");
-			} finally {
-				try {
-					preparedStatement.close();
-					log.trace("statement closed");
-				} catch (SQLException e) {
-					log.warn("Cannot close statement", e);
-				}
-			}
 		} catch (SQLException e) {
 			log.warn("Cannot create user", e);
 			throw new DAOException("Cannot create order line", e);
 		} finally {
-			try {
-				connection.close();
-				log.trace("Connection closed");
-			} catch (SQLException e) {
-				log.warn("Cannot close connection", e);
-			}
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
 		}
 	}
 
@@ -70,53 +57,31 @@ public class PostgreSqlOrderLineDao implements OrderLineDao {
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
 		try {
-			log.trace("Open connection");
-			connection = daoFactory.getConnection();
-			try {
-				log.trace("Create prepared statement");
-				preparedStatement = connection.prepareStatement(sql);
+            log.trace("Open connection");
+            connection = daoFactory.getConnection();
+            log.trace("Create prepared statement");
+            preparedStatement = connection.prepareStatement(sql);
 
-				try {
-					log.trace("Get result set");
-					resultSet = preparedStatement.executeQuery();
-					while (resultSet.next()) {
-						int goodsId = resultSet.getInt("goods_id");
-						log.trace("Creating goods for order line");
-						Goods goods = new PostgreSqlGoodsDao().read(goodsId);
-						log.trace("creating order line");
-						OrderLine orderLine = new OrderLine(goods, resultSet.getInt("amount"));
-						orderLines.add(orderLine);
-						log.trace("Order line for goods " + goodsId + " added to list");
-					}
-				} finally {
-					try {
-						resultSet.close();
-						log.trace("result set closed");
-					} catch (SQLException e) {
-						log.warn("Cannot close result set", e);
-					}
-				}
-			} finally {
-				try {
-					preparedStatement.close();
-					log.trace("statement closed");
-				} catch (SQLException e) {
-					log.warn("Cannot close statement", e);
-				}
-			}
+            log.trace("Get result set");
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int goodsId = resultSet.getInt("goods_id");
+                log.trace("Creating goods for order line");
+                Goods goods = new PostgreSqlGoodsDao().read(goodsId);
+                log.trace("creating order line");
+                OrderLine orderLine = new OrderLine(goods, resultSet.getInt("amount"));
+                orderLines.add(orderLine);
+                log.trace("Order line for goods " + goodsId + " added to list");
+            }
 		} catch (SQLException e) {
 			log.warn("Cannot create user", e);
 			throw new DAOException("Cannot get all order lines", e);
 		} finally {
-			try {
-				connection.close();
-				log.trace("Connection closed");
-			} catch (SQLException e) {
-				log.warn("Cannot close connection", e);
-			}
+            JdbcUtils.closeQuietly(resultSet);
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
 		}
 		log.trace("Returning order lines");
 		return orderLines;
 	}
-
 }

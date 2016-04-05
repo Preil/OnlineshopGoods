@@ -14,13 +14,12 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 
-@WebServlet("/login")
+//@WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if (null == request.getParameter("login") || null == request.getParameter("password")
 				|| request.getParameter("login").isEmpty()
 				|| request.getParameter("password").isEmpty()) {
@@ -30,8 +29,8 @@ public class LoginServlet extends HttpServlet {
 		
 		String login = request.getParameter("login");
 		String password = request.getParameter("password");
-		
 		ShopManager shopManager = null;
+
 		try {
 			shopManager = new ShopManagerImpl();
 			shopManager.authorization(login, password);

@@ -13,14 +13,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 
-
 @WebServlet("/addgoods")
 public class AddGoodsServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String goodsName = request.getParameter("goodsname");
 		String groupName = request.getParameter("groupname");
 		int price = Math.round(Float.parseFloat(request.getParameter("price"))*100);

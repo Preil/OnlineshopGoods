@@ -17,13 +17,11 @@ import ru.onlineshop.domain.goods.Goods;
 
 public class PostgreSqlGoodsDao implements GoodsDao {
 	private DaoFactory daoFactory = DaoFactory.getInstance();
-
 	private static Logger log = Logger.getLogger(PostgreSqlGoodsDao.class.getName());
 
 	@Override
 	public Goods create(String name, int price, int groupId, int amount) throws DAOException {
-		log.trace("Get parameters: name=" + name + ", price=" + price + ", groupId=" + groupId
-				+ ", amount=" + amount);
+		log.trace("Get parameters: name=" + name + ", price=" + price + ", groupId=" + groupId + ", amount=" + amount);
 		String sql = "insert into goods (goods_name, price, amount, group_id) values (?, ?, ?, ?);";
 
 		Goods tempGoods = null;
@@ -33,50 +31,28 @@ public class PostgreSqlGoodsDao implements GoodsDao {
 		try {
 			log.trace("Open connection");
 			connection = daoFactory.getConnection();
-			try {
-				preparedStatement = connection.prepareStatement(sql,
-						Statement.RETURN_GENERATED_KEYS);
-				preparedStatement.setString(1, name);
-				preparedStatement.setInt(2, price);
-				preparedStatement.setInt(3, amount);
-				preparedStatement.setInt(4, groupId);
-				preparedStatement.execute();
+            preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setString(1, name);
+            preparedStatement.setInt(2, price);
+            preparedStatement.setInt(3, amount);
+            preparedStatement.setInt(4, groupId);
+            preparedStatement.execute();
 
-				try {
-					log.trace("Get result set");
-					resultSet = preparedStatement.getGeneratedKeys();
-					resultSet.next();
-					log.trace("Create goods to return");
-					tempGoods = new Goods(resultSet.getString("goods_name"),
-							resultSet.getInt("price"), resultSet.getInt("amount"),
-							resultSet.getInt("group_id"));
-					tempGoods.setId(resultSet.getInt("id"));
-				} finally {
-					try {
-						resultSet.close();
-						log.trace("result set closed");
-					} catch (SQLException e) {
-						log.warn("Cannot close result set", e);
-					}
-				}
-			} finally {
-				try {
-					preparedStatement.close();
-					log.trace("statement closed");
-				} catch (SQLException e) {
-					log.warn("Cannot close statement", e);
-				}
-			}
+            log.trace("Get result set");
+            resultSet = preparedStatement.getGeneratedKeys();
+            resultSet.next();
+            log.trace("Create goods to return");
+            tempGoods = new Goods(resultSet.getString("goods_name"),
+                    resultSet.getInt("price"), resultSet.getInt("amount"),
+                    resultSet.getInt("group_id"));
+            tempGoods.setId(resultSet.getInt("id"));
 		} catch (SQLException e) {
 			log.warn("Cannot create goods", e);
 			throw new DAOException("Cannot create goods", e);
 		} finally {
-			try {
-				connection.close();
-				log.trace("Connection closed");
-			} catch (SQLException e) {
-				log.warn("Cannot close connection", e);
-			}
+            JdbcUtils.closeQuietly(resultSet);
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
 		}
 		log.trace("Goods created: id=" + tempGoods.getId() + ", name=" + tempGoods.getName()
 				+ ", price=" + tempGoods.getPrice() + ", groupId=" + tempGoods.getGroupId()
@@ -97,43 +73,22 @@ public class PostgreSqlGoodsDao implements GoodsDao {
 		try {
 			log.trace("Open connection");
 			connection = daoFactory.getConnection();
-			try {
-				preparedStatement = connection.prepareStatement(sql);
-				preparedStatement.setInt(1, goodsId);
-				try {
-					log.trace("Get result set");
-					resultSet = preparedStatement.executeQuery();
-					resultSet.next();
-					log.trace("Create goods to return");
-					tempGoods = new Goods(resultSet.getString("goods_name"),
-							resultSet.getInt("price"), resultSet.getInt("group_id"),
-							resultSet.getInt("amount"));
-					tempGoods.setId(resultSet.getInt("id"));
-				} finally {
-					try {
-						resultSet.close();
-						log.trace("result set closed");
-					} catch (SQLException e) {
-						log.warn("Cannot close result set", e);
-					}
-				}
-			} finally {
-				try {
-					preparedStatement.close();
-					log.trace("statement closed");
-				} catch (SQLException e) {
-					log.warn("Cannot close statement", e);
-				}
-			}
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, goodsId);
+            log.trace("Get result set");
+            resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            log.trace("Create goods to return");
+            tempGoods = new Goods(resultSet.getString("goods_name"),
+                    resultSet.getInt("price"), resultSet.getInt("group_id"),
+                    resultSet.getInt("amount"));
+            tempGoods.setId(resultSet.getInt("id"));
 		} catch (SQLException e) {
 			throw new DAOException("Cannot read goods", e);
 		} finally {
-			try {
-				connection.close();
-				log.trace("Connection closed");
-			} catch (SQLException e) {
-				log.warn("Cannot close connection", e);
-			}
+            JdbcUtils.closeQuietly(resultSet);
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
 		}
 		log.trace("Readed info about goods: id=" + tempGoods.getId());
 		log.trace("Returning goods");
@@ -149,30 +104,18 @@ public class PostgreSqlGoodsDao implements GoodsDao {
 		try {
 			log.trace("Open connection");
 			connection = daoFactory.getConnection();
-			try {
 				log.trace("Create prepared statement");
 				preparedStatement = connection.prepareStatement(sql);
 				preparedStatement.setInt(1, price);
 				preparedStatement.setInt(2, goodsId);
 				preparedStatement.executeUpdate();
 				log.trace("Price of goods id=" + goodsId + ", changed to " + price);
-			} finally {
-				try {
-					preparedStatement.close();
-					log.trace("statement closed");
-				} catch (SQLException e) {
-					log.warn("Cannot close statement", e);
-				}
-			}
+
 		} catch (SQLException e) {
 			throw new DAOException("Cannot update goods price", e);
 		} finally {
-			try {
-				connection.close();
-				log.trace("Connection closed");
-			} catch (SQLException e) {
-				log.warn("Cannot close connection", e);
-			}
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
 		}
 	}
 
@@ -185,65 +128,38 @@ public class PostgreSqlGoodsDao implements GoodsDao {
 		try {
 			log.trace("Open connection");
 			connection = daoFactory.getConnection();
-			try {
 				log.trace("Create prepared statement");
 				preparedStatement = connection.prepareStatement(sql);
 				preparedStatement.setInt(1, amount);
 				preparedStatement.setInt(2, goodsId);
 				preparedStatement.executeUpdate();
 				log.trace("Amount of goods id=" + goodsId + ", changed to " + amount);
-			} finally {
-				try {
-					preparedStatement.close();
-					log.trace("statement closed");
-				} catch (SQLException e) {
-					log.warn("Cannot close statement", e);
-				}
-			}
 		} catch (SQLException e) {
 			throw new DAOException("Cannot update goods amount", e);
 		} finally {
-			try {
-				connection.close();
-				log.trace("Connection closed");
-			} catch (SQLException e) {
-				log.warn("Cannot close connection", e);
-			}
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
 		}
 	}
 
 	@Override
 	public void delete(int goodsId) throws DAOException {
 		String sql = "delete from goods where id = ?;";
-
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
 		try {
 			log.trace("Open connection");
 			connection = daoFactory.getConnection();
-			try {
-				log.trace("Create prepared statement");
-				preparedStatement = connection.prepareStatement(sql);
-				preparedStatement.setInt(1, goodsId);
-				preparedStatement.executeUpdate();
-				log.trace("Goods deleted id=" + goodsId);
-			} finally {
-				try {
-					preparedStatement.close();
-					log.trace("statement closed");
-				} catch (SQLException e) {
-					log.warn("Cannot close statement", e);
-				}
-			}
+            log.trace("Create prepared statement");
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, goodsId);
+            preparedStatement.executeUpdate();
+            log.trace("Goods deleted id=" + goodsId);
 		} catch (SQLException e) {
 			throw new DAOException("Cannot delete goods", e);
 		} finally {
-			try {
-				connection.close();
-				log.trace("Connection closed");
-			} catch (SQLException e) {
-				log.warn("Cannot close connection", e);
-			}
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
 		}
 	}
 
@@ -251,7 +167,6 @@ public class PostgreSqlGoodsDao implements GoodsDao {
 	public List<Goods> getAll() throws DAOException {
 		List<Goods> goods = new ArrayList<>();
 		String sql = "select * from goods;";
-
 		Goods tempGoods = null;
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
@@ -259,47 +174,25 @@ public class PostgreSqlGoodsDao implements GoodsDao {
 		try {
 			log.trace("Open connection");
 			connection = daoFactory.getConnection();
-			try {
-				log.trace("Create prepared statement");
-				preparedStatement = connection.prepareStatement(sql);
-
-				try {
-					log.trace("Get result set");
-					resultSet = preparedStatement.executeQuery();
-					while (resultSet.next()) {
-						log.trace("Create goods to add to the set");
-						tempGoods = new Goods(resultSet.getString("goods_name"),
-								resultSet.getInt("price"), resultSet.getInt("group_id"),
-								resultSet.getInt("amount"));
-						tempGoods.setId(resultSet.getInt("id"));
-						goods.add(tempGoods);
-						log.trace("Goods " + tempGoods.getId() + " added to set");
-					}
-				} finally {
-					try {
-						resultSet.close();
-						log.trace("result set closed");
-					} catch (SQLException e) {
-						log.warn("Cannot close result set", e);
-					}
-				}
-			} finally {
-				try {
-					preparedStatement.close();
-					log.trace("statement closed");
-				} catch (SQLException e) {
-					log.warn("Cannot close statement", e);
-				}
-			}
+            log.trace("Create prepared statement");
+            preparedStatement = connection.prepareStatement(sql);
+            log.trace("Get result set");
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                log.trace("Create goods to add to the set");
+                tempGoods = new Goods(resultSet.getString("goods_name"),
+                        resultSet.getInt("price"), resultSet.getInt("group_id"),
+                        resultSet.getInt("amount"));
+                tempGoods.setId(resultSet.getInt("id"));
+                goods.add(tempGoods);
+                log.trace("Goods " + tempGoods.getId() + " added to set");
+            }
 		} catch (SQLException e) {
 			throw new DAOException("Cannot get all goods", e);
 		} finally {
-			try {
-				connection.close();
-				log.trace("Connection closed");
-			} catch (SQLException e) {
-				log.warn("Cannot close connection", e);
-			}
+            JdbcUtils.closeQuietly(resultSet);
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
 		}
 		log.trace("Returning goods");
 		return goods;
@@ -317,48 +210,27 @@ public class PostgreSqlGoodsDao implements GoodsDao {
 		try {
 			log.trace("Open connection");
 			connection = daoFactory.getConnection();
-			try {
-				log.trace("Create prepared statement");
-				preparedStatement = connection.prepareStatement(sql);
-				preparedStatement.setString(1, name);
+            log.trace("Create prepared statement");
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, name);
+            log.trace("Get result set");
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                log.trace("Create goods to add to the set");
+                tempGoods = new Goods(resultSet.getString("goods_name"),
+                        resultSet.getInt("price"), resultSet.getInt("amount"),
+                        resultSet.getInt("group_id"));
+                tempGoods.setId(resultSet.getInt("id"));
+                goods.add(tempGoods);
+                log.trace("Goods " + tempGoods.getId() + " added to set");
+                }
 
-				try {
-					log.trace("Get result set");
-					resultSet = preparedStatement.executeQuery();
-					while (resultSet.next()) {
-						log.trace("Create goods to add to the set");
-						tempGoods = new Goods(resultSet.getString("goods_name"),
-								resultSet.getInt("price"), resultSet.getInt("amount"),
-								resultSet.getInt("group_id"));
-						tempGoods.setId(resultSet.getInt("id"));
-						goods.add(tempGoods);
-						log.trace("Goods " + tempGoods.getId() + " added to set");
-					}
-				} finally {
-					try {
-						resultSet.close();
-						log.trace("result set closed");
-					} catch (SQLException e) {
-						log.warn("Cannot close result set", e);
-					}
-				}
-			} finally {
-				try {
-					preparedStatement.close();
-					log.trace("statement closed");
-				} catch (SQLException e) {
-					log.warn("Cannot close statement", e);
-				}
-			}
 		} catch (SQLException e) {
 			throw new DAOException("Cannot get goods by name=" + name, e);
 		} finally {
-			try {
-				connection.close();
-				log.trace("Connection closed");
-			} catch (SQLException e) {
-				log.warn("Cannot close connection", e);
-			}
+            JdbcUtils.closeQuietly(resultSet);
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
 		}
 		log.trace("Returning all goods with name=" + name);
 		return goods;
@@ -375,46 +247,24 @@ public class PostgreSqlGoodsDao implements GoodsDao {
 		try {
 			log.trace("Open connection");
 			connection = daoFactory.getConnection();
-			try {
-				log.trace("Create prepared statement");
-				preparedStatement = connection.prepareStatement(sql);
-				preparedStatement.setInt(1, goodsId);
-
-				try {
-					log.trace("Get result set");
-					resultSet = preparedStatement.executeQuery();
-					while (resultSet.next()) {
-						log.trace("Create goods to add to the set");
-						tempGoods = new Goods(resultSet.getString("goods_name"),
-								resultSet.getInt("price"), resultSet.getInt("amount"),
-								resultSet.getInt("group_id"));
-						tempGoods.setId(resultSet.getInt("id"));
+            log.trace("Create prepared statement");
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, goodsId);
+            log.trace("Get result set");
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                log.trace("Create goods to add to the set");
+                tempGoods = new Goods(resultSet.getString("goods_name"),
+                        resultSet.getInt("price"), resultSet.getInt("amount"),
+                        resultSet.getInt("group_id"));
+                tempGoods.setId(resultSet.getInt("id"));
 					}
-				} finally {
-					try {
-						resultSet.close();
-						log.trace("result set closed");
-					} catch (SQLException e) {
-						log.warn("Cannot close result set", e);
-					}
-				}
-			} finally {
-				try {
-					preparedStatement.close();
-					log.trace("statement closed");
-				} catch (SQLException e) {
-					log.warn("Cannot close statement", e);
-				}
-			}
 		} catch (SQLException e) {
 			throw new DAOException("Cannot get goods by id=" + goodsId, e);
 		} finally {
-			try {
-				connection.close();
-				log.trace("Connection closed");
-			} catch (SQLException e) {
-				log.warn("Cannot close connection", e);
-			}
+            JdbcUtils.closeQuietly(resultSet);
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
 		}
 		log.trace("Returning goods with id=" + goodsId);
 		return tempGoods;
@@ -433,14 +283,12 @@ public class PostgreSqlGoodsDao implements GoodsDao {
 		try {
 			log.trace("Open connection");
 			connection = daoFactory.getConnection();
-			try {
 				log.trace("Create prepared statement");
 				preparedStatement = connection.prepareStatement(sql);
 				preparedStatement.setInt(1, groupId);
 				preparedStatement.setInt(2, lowerPrice);
 				preparedStatement.setInt(3, topPrice);
 
-				try {
 					log.trace("Get result set");
 					resultSet = preparedStatement.executeQuery();
 					while (resultSet.next()) {
@@ -452,32 +300,13 @@ public class PostgreSqlGoodsDao implements GoodsDao {
 						goods.add(tempGoods);
 						log.trace("Goods " + tempGoods.getId() + " added to set");
 					}
-				} finally {
-					try {
-						resultSet.close();
-						log.trace("result set closed");
-					} catch (SQLException e) {
-						log.warn("Cannot close result set", e);
-					}
-				}
-			} finally {
-				try {
-					preparedStatement.close();
-					log.trace("statement closed");
-				} catch (SQLException e) {
-					log.warn("Cannot close statement", e);
-				}
-			}
 		} catch (SQLException e) {
 			throw new DAOException("Cannot get goods from groupId=" + groupId + " and price from "
 					+ lowerPrice + " to " + topPrice, e);
 		} finally {
-			try {
-				connection.close();
-				log.trace("Connection closed");
-			} catch (SQLException e) {
-				log.warn("Cannot close connection", e);
-			}
+            JdbcUtils.closeQuietly(resultSet);
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
 		}
 		log.trace("Returning all goods from groupId=" + groupId + " and price from " + lowerPrice
 				+ " to " + topPrice);
@@ -496,50 +325,29 @@ public class PostgreSqlGoodsDao implements GoodsDao {
 		try {
 			log.trace("Open connection");
 			connection = daoFactory.getConnection();
-			try {
-				log.trace("Create prepared statement");
-				preparedStatement = connection.prepareStatement(sql);
-				preparedStatement.setInt(1, lowerPrice);
-				preparedStatement.setInt(2, topPrice);
+            log.trace("Create prepared statement");
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, lowerPrice);
+            preparedStatement.setInt(2, topPrice);
 
-				try {
-					log.trace("Get result set");
-					resultSet = preparedStatement.executeQuery();
-					while (resultSet.next()) {
-						log.trace("Create goods to add to the set");
-						tempGoods = new Goods(resultSet.getString("goods_name"),
-								resultSet.getInt("price"), resultSet.getInt("amount"),
-								resultSet.getInt("group_id"));
-						tempGoods.setId(resultSet.getInt("id"));
-						goods.add(tempGoods);
-						log.trace("Goods " + tempGoods.getId() + " added to set");
-					}
-				} finally {
-					try {
-						resultSet.close();
-						log.trace("result set closed");
-					} catch (SQLException e) {
-						log.warn("Cannot close result set", e);
-					}
-				}
-			} finally {
-				try {
-					preparedStatement.close();
-					log.trace("statement closed");
-				} catch (SQLException e) {
-					log.warn("Cannot close statement", e);
-				}
-			}
+            log.trace("Get result set");
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                log.trace("Create goods to add to the set");
+                tempGoods = new Goods(resultSet.getString("goods_name"),
+                        resultSet.getInt("price"), resultSet.getInt("amount"),
+                        resultSet.getInt("group_id"));
+                tempGoods.setId(resultSet.getInt("id"));
+                goods.add(tempGoods);
+                log.trace("Goods " + tempGoods.getId() + " added to set");
+            }
 		} catch (SQLException e) {
 			throw new DAOException(
 					"Cannot get goods where price from " + lowerPrice + " to " + topPrice, e);
 		} finally {
-			try {
-				connection.close();
-				log.trace("Connection closed");
-			} catch (SQLException e) {
-				log.warn("Cannot close connection", e);
-			}
+            JdbcUtils.closeQuietly(resultSet);
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
 		}
 		log.trace("Returning all goods where price from " + lowerPrice + " to " + topPrice);
 		return goods;
@@ -549,7 +357,6 @@ public class PostgreSqlGoodsDao implements GoodsDao {
 	public List<Goods> getGroupGoods(int groupId) throws DAOException {
 		List<Goods> goods = new ArrayList<>();
 		String sql = "select * from goods where group_id = ?;";
-
 		Goods tempGoods = null;
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
@@ -557,51 +364,28 @@ public class PostgreSqlGoodsDao implements GoodsDao {
 		try {
 			log.trace("Open connection");
 			connection = daoFactory.getConnection();
-			try {
-				log.trace("Create prepared statement");
-				preparedStatement = connection.prepareStatement(sql);
-				preparedStatement.setInt(1, groupId);
-
-				try {
-					log.trace("Get result set");
-					resultSet = preparedStatement.executeQuery();
-					while (resultSet.next()) {
-						log.trace("Create goods to add to the set");
-						tempGoods = new Goods(resultSet.getString("goods_name"),
-								resultSet.getInt("price"),
-                                resultSet.getInt("group_id"), resultSet.getInt("amount"));
-						tempGoods.setId(resultSet.getInt("id"));
-						goods.add(tempGoods);
-						log.trace("Goods " + tempGoods.getId() + " added to set");
-					}
-				} finally {
-					try {
-						resultSet.close();
-						log.trace("result set closed");
-					} catch (SQLException e) {
-						log.warn("Cannot close result set", e);
-					}
-				}
-			} finally {
-				try {
-					preparedStatement.close();
-					log.trace("statement closed");
-				} catch (SQLException e) {
-					log.warn("Cannot close statement", e);
-				}
-			}
+            log.trace("Create prepared statement");
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, groupId);
+            log.trace("Get result set");
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                log.trace("Create goods to add to the set");
+                tempGoods = new Goods(resultSet.getString("goods_name"),
+                        resultSet.getInt("price"),
+                        resultSet.getInt("group_id"), resultSet.getInt("amount"));
+                tempGoods.setId(resultSet.getInt("id"));
+                goods.add(tempGoods);
+                log.trace("Goods " + tempGoods.getId() + " added to set");
+            }
 		} catch (SQLException e) {
 			throw new DAOException("Cannot get goods by groupId=" + groupId, e);
 		} finally {
-			try {
-				connection.close();
-				log.trace("Connection closed");
-			} catch (SQLException e) {
-				log.warn("Cannot close connection", e);
-			}
+            JdbcUtils.closeQuietly(resultSet);
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
 		}
 		log.trace("Returning all goods from groupId=" + groupId);
 		return goods;
 	}
-
 }

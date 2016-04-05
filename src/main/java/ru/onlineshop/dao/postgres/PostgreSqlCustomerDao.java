@@ -29,53 +29,30 @@ public class PostgreSqlCustomerDao implements CustomerDao {
 		try {
 			log.trace("Open connection");
 			connection = daoFactory.getConnection();
-			try {
-				log.trace("Create prepared statement");
-				preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-				preparedStatement.setString(1, login);
-				preparedStatement.setString(2, password);
-				preparedStatement.setString(3, name);
-				preparedStatement.setString(4, email);
-				preparedStatement.execute();
-				try {
-					log.trace("Get result set");
-					resultSet = preparedStatement.getGeneratedKeys();
-					resultSet.next();
-					log.trace("Create customer to return");
-					customer = new Customer(resultSet.getString("login"), resultSet.getString("password"), resultSet.getString("name"), resultSet.getString("email"));
-					customer.setAddress(resultSet.getString("address"));
-					customer.setPhone(resultSet.getString("phone"));
-					customer.setCreditCardInfo(resultSet.getString("credit_card"));
-					customer.setId(resultSet.getInt("id"));
-					log.info("Customer with login=" + login + " created!");
-				} finally {
-					try {
-                        if (resultSet != null) {
-                            resultSet.close();
-                        }
-						log.trace("result set closed");
-					} catch (SQLException e) {
-						log.warn("Cannot close result set", e);
-					}
-				}
-			} finally {
-				try {
-					preparedStatement.close();
-					log.trace("statement closed");
-				} catch (SQLException e) {
-					log.warn("Cannot close statement", e);
-				}
-			}
+            log.trace("Create prepared statement");
+            preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setString(1, login);
+            preparedStatement.setString(2, password);
+            preparedStatement.setString(3, name);
+            preparedStatement.setString(4, email);
+            preparedStatement.execute();
+            log.trace("Get result set");
+            resultSet = preparedStatement.getGeneratedKeys();
+            resultSet.next();
+            log.trace("Create customer to return");
+            customer = new Customer(resultSet.getString("login"), resultSet.getString("password"), resultSet.getString("name"), resultSet.getString("email"));
+            customer.setAddress(resultSet.getString("address"));
+            customer.setPhone(resultSet.getString("phone"));
+            customer.setCreditCardInfo(resultSet.getString("credit_card"));
+            customer.setId(resultSet.getInt("id"));
+            log.info("Customer with login=" + login + " created!");
 		} catch (SQLException e) {
 			log.warn("Cannot create user", e);
 			throw new DAOException("Cannot create user", e);
 		} finally {
-			try {
-				connection.close();
-				log.trace("Connection closed");
-			} catch (SQLException e) {
-				log.warn("Cannot close connection", e);
-			}
+            JdbcUtils.closeQuietly(resultSet);
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
 		}
 		log.trace("Returning customer");
 		return customer;
@@ -91,51 +68,29 @@ public class PostgreSqlCustomerDao implements CustomerDao {
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
 		try {
-			log.trace("Open connection");
-			connection = daoFactory.getConnection();
-			try {
-				log.trace("Create prepared statement");
-				preparedStatement = connection.prepareStatement(sql);
-				preparedStatement.setString(1, login);
-				try {
-					log.trace("Get result set");
-					resultSet = preparedStatement.executeQuery();
-					if (resultSet.next()) {
-						log.trace("Create customer to return");
-						customer = new Customer(resultSet.getString("login"), resultSet.getString("password"),
-								resultSet.getString("name"), resultSet.getString("email"));
-						customer.setAddress(resultSet.getString("address"));
-						customer.setPhone(resultSet.getString("phone"));
-						customer.setCreditCardInfo(resultSet.getString("credit_card"));
-						customer.setId(resultSet.getInt("id"));
-					}
-				} finally {
-					try {
-						resultSet.close();
-						log.trace("result set closed");
-					} catch (SQLException e) {
-						log.warn("Cannot close result set", e);
-					}
-				}
-			} finally {
-				try {
-					preparedStatement.close();
-					log.trace("statement closed");
-				} catch (SQLException e) {
-					log.warn("Cannot close statement", e);
-				}
-			}
+        log.trace("Open connection");
+        connection = daoFactory.getConnection();
+        log.trace("Create prepared statement");
+        preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setString(1, login);
+        log.trace("Get result set");
+        resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            log.trace("Create customer to return");
+            customer = new Customer(resultSet.getString("login"), resultSet.getString("password"),
+                    resultSet.getString("name"), resultSet.getString("email"));
+            customer.setAddress(resultSet.getString("address"));
+            customer.setPhone(resultSet.getString("phone"));
+            customer.setCreditCardInfo(resultSet.getString("credit_card"));
+            customer.setId(resultSet.getInt("id"));
+            }
 		} catch (SQLException e) {
 			throw new DAOException("Cannot read user", e);
 		} finally {
-			try {
-				connection.close();
-				log.trace("Connection closed");
-			} catch (SQLException e) {
-				log.warn("Cannot close connection", e);
-			}
+            JdbcUtils.closeQuietly(resultSet);
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
 		}
-
 		if (null == customer) {
 			log.debug("Customer not found");
 		} else {
@@ -157,58 +112,36 @@ public class PostgreSqlCustomerDao implements CustomerDao {
 		try {
 			log.trace("Open connection");
 			connection = daoFactory.getConnection();
-			try {
-				log.trace("Create prepared statement");
-				preparedStatement = connection.prepareStatement(sql);
-				preparedStatement.setString(1, password);
-				preparedStatement.setString(2, name);
-				preparedStatement.setString(3, address);
-				preparedStatement.setString(4, phone);
-				preparedStatement.setString(5, email);
-				preparedStatement.setString(6, creditCardInfo);
-				preparedStatement.setString(7, login);
-				preparedStatement.execute();
+            log.trace("Create prepared statement");
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, password);
+            preparedStatement.setString(2, name);
+            preparedStatement.setString(3, address);
+            preparedStatement.setString(4, phone);
+            preparedStatement.setString(5, email);
+            preparedStatement.setString(6, creditCardInfo);
+            preparedStatement.setString(7, login);
+            preparedStatement.execute();
+            log.trace("Get result set");
+            resultSet = preparedStatement.getGeneratedKeys();
+            resultSet.next();
+            log.trace("Create customer to return");
+            customer = new Customer(resultSet.getString("login"), resultSet.getString("password"),
+                    resultSet.getString("name"), resultSet.getString("email"));
+            customer.setAddress(resultSet.getString("address"));
+            customer.setPhone(resultSet.getString("phone"));
+            customer.setCreditCardInfo(resultSet.getString("credit_card"));
+            customer.setId(resultSet.getInt("id"));
 
-				try {
-					log.trace("Get result set");
-					resultSet = preparedStatement.getGeneratedKeys();
-					resultSet.next();
-					log.trace("Create customer to return");
-					customer = new Customer(resultSet.getString("login"), resultSet.getString("password"),
-							resultSet.getString("name"), resultSet.getString("email"));
-					customer.setAddress(resultSet.getString("address"));
-					customer.setPhone(resultSet.getString("phone"));
-					customer.setCreditCardInfo(resultSet.getString("credit_card"));
-					customer.setId(resultSet.getInt("id"));
-				} finally {
-					try {
-						resultSet.close();
-						log.trace("result set closed");
-					} catch (SQLException e) {
-						log.warn("Cannot close result set", e);
-					}
-				}
-			} finally {
-				try {
-					preparedStatement.close();
-					log.trace("statement closed");
-				} catch (SQLException e) {
-					log.warn("Cannot close statement", e);
-				}
-			}
 		} catch (SQLException e) {
 			throw new DAOException("Cannot update user ", e);
 		} finally {
-			try {
-				connection.close();
-				log.trace("Connection closed");
-			} catch (SQLException e) {
-				log.warn("Cannot close connection", e);
-			}
+            JdbcUtils.closeQuietly(resultSet);
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
 		}
 		log.trace("Customer " + login + " has updated info");
 		log.trace("Returning updated customer");
 		return customer;
-
 	}
 }
