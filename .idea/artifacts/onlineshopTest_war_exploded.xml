@@ -7,6 +7,7 @@
           <element id="module-output" name="onlineshopTest" />
         </element>
         <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: org.mockito:mockito-all:1.9.5" />
           <element id="library" level="project" name="Maven: log4j:log4j:1.2.17" />
           <element id="library" level="project" name="Maven: org.wildfly.plugins:wildfly-maven-plugin:maven-plugin:1.1.0.Alpha5" />
           <element id="library" level="project" name="Maven: javax.inject:javax.inject:1" />

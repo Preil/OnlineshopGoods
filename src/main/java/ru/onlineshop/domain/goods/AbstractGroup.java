@@ -8,6 +8,7 @@ import java.util.List;
 
 
 public abstract class AbstractGroup {
+
     private DaoFactory daoFactory = DaoFactory.getInstance();
     private GroupDao groupDao = daoFactory.getGroupDao();
 

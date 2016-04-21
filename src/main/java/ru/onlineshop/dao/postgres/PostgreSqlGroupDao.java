@@ -16,8 +16,8 @@ import ru.onlineshop.domain.goods.Group;
 
 
 public class PostgreSqlGroupDao implements GroupDao {
-    private DaoFactory daoFactory = DaoFactory.getInstance();
 
+    private DaoFactory daoFactory = DaoFactory.getInstance();
     private static Logger log = Logger.getLogger(PostgreSqlGroupDao.class.getName());
 
     @Override
@@ -32,48 +32,24 @@ public class PostgreSqlGroupDao implements GroupDao {
         try {
             log.trace("Open connection");
             connection = daoFactory.getConnection();
-            try {
-                log.trace("Create prepared statement");
-                preparedStatement = connection.prepareStatement(sql,
-                        Statement.RETURN_GENERATED_KEYS);
-                preparedStatement.setString(1, name);
-                preparedStatement.setInt(2, parentId);
-                preparedStatement.execute();
+            log.trace("Create prepared statement");
+            preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setString(1, name);
+            preparedStatement.setInt(2, parentId);
+            preparedStatement.execute();
 
-                try {
-                    log.trace("Get result set");
-                    resultSet = preparedStatement.getGeneratedKeys();
-                    resultSet.next();
-                    log.trace("Create group to return");
-                    tempGroup = new Group(resultSet.getString("group_name"),
-                            resultSet.getInt("group_parent_id"));
-                    tempGroup.setId(resultSet.getInt("id"));
-                } finally {
-                    try {
-                        resultSet.close();
-                        log.trace("result set closed");
-                    } catch (SQLException e) {
-                        log.warn("Cannot close result set", e);
-                    }
-                }
-            } finally {
-                try {
-                    preparedStatement.close();
-                    log.trace("statement closed");
-                } catch (SQLException e) {
-                    log.warn("Cannot close statement", e);
-                }
-            }
+            log.trace("Get result set");
+            resultSet = preparedStatement.getGeneratedKeys();
+            resultSet.next();
+            log.trace("Create Group to return");
+            tempGroup = parseResultSet(resultSet);
         } catch (SQLException e) {
-            log.warn("Cannot create user", e);
+            log.warn("Cannot create Group", e);
             throw new DAOException("Cannot create group", e);
         } finally {
-            try {
-                connection.close();
-                log.trace("Connection closed");
-            } catch (SQLException e) {
-                log.warn("Cannot close connection", e);
-            }
+            JdbcUtils.closeQuietly(resultSet);
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
         }
         log.trace("Returning group");
         return tempGroup;
@@ -91,45 +67,24 @@ public class PostgreSqlGroupDao implements GroupDao {
         try {
             log.trace("Open connection");
             connection = daoFactory.getConnection();
-            try {
-                log.trace("Create prepared statement");
-                preparedStatement = connection.prepareStatement(sql);
-                preparedStatement.setInt(1, groupId);
+            log.trace("Create prepared statement");
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, groupId);
 
-                try {
-                    log.trace("Get result set");
-                    resultSet = preparedStatement.executeQuery();
-                    resultSet.next();
-                    log.trace("Create group to return");
-                    tempGroup = new Group(resultSet.getString("group_name"),
-                            resultSet.getInt("group_parent_id"));
-                    tempGroup.setId(resultSet.getInt("id"));
-                } finally {
-                    try {
-                        resultSet.close();
-                        log.trace("result set closed");
-                    } catch (SQLException e) {
-                        log.warn("Cannot close result set", e);
-                    }
-                }
-            } finally {
-                try {
-                    preparedStatement.close();
-                    log.trace("statement closed");
-                } catch (SQLException e) {
-                    log.warn("Cannot close statement", e);
-                }
-            }
+            log.trace("Get result set");
+            resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            log.trace("Create group to return");
+            tempGroup = parseResultSet(resultSet);
+            tempGroup.setId(resultSet.getInt("id"));
+
         } catch (SQLException e) {
             log.warn("Cannot create user", e);
             throw new DAOException("Cannot read group", e);
         } finally {
-            try {
-                connection.close();
-                log.trace("Connection closed");
-            } catch (SQLException e) {
-                log.warn("Cannot close connection", e);
-            }
+            JdbcUtils.closeQuietly(resultSet);
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
         }
         log.trace("Returning group");
         return tempGroup;
@@ -145,30 +100,18 @@ public class PostgreSqlGroupDao implements GroupDao {
         try {
             log.trace("Open connection");
             connection = daoFactory.getConnection();
-            try {
-                log.trace("Create prepared statement");
-                preparedStatement = connection.prepareStatement(sql);
-                preparedStatement.setInt(1, groupId);
-                preparedStatement.executeUpdate();
-                log.info("Group " + groupId + " deleted");
-            } finally {
-                try {
-                    preparedStatement.close();
-                    log.trace("statement closed");
-                } catch (SQLException e) {
-                    log.warn("Cannot close statement", e);
-                }
-            }
+            log.trace("Create prepared statement");
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, groupId);
+            preparedStatement.executeUpdate();
+            log.info("Group " + groupId + " deleted");
+
         } catch (SQLException e) {
             log.warn("Cannot create user", e);
             throw new DAOException("Cannot delete group", e);
         } finally {
-            try {
-                connection.close();
-                log.trace("Connection closed");
-            } catch (SQLException e) {
-                log.warn("Cannot close connection", e);
-            }
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
         }
     }
 
@@ -184,47 +127,24 @@ public class PostgreSqlGroupDao implements GroupDao {
         try {
             log.trace("Open connection");
             connection = daoFactory.getConnection();
-            try {
-                log.trace("Create prepared statement");
-                preparedStatement = connection.prepareStatement(sql);
+            log.trace("Create prepared statement");
+            preparedStatement = connection.prepareStatement(sql);
 
-                try {
-                    log.trace("Get result set");
-                    resultSet = preparedStatement.executeQuery();
-                    log.trace("Reading groups from DB and add them to Set");
-                    while (resultSet.next()) {
-                        tempGroup = new Group(resultSet.getString("group_name"),
-                                resultSet.getInt("group_parent_id"));
-                        tempGroup.setId(resultSet.getInt("id"));
-                        groups.add(tempGroup);
-                        log.trace("Group " + tempGroup.getId() + " added to set");
-                    }
-                } finally {
-                    try {
-                        resultSet.close();
-                        log.trace("result set closed");
-                    } catch (SQLException e) {
-                        log.warn("Cannot close result set", e);
-                    }
-                }
-            } finally {
-                try {
-                    preparedStatement.close();
-                    log.trace("statement closed");
-                } catch (SQLException e) {
-                    log.warn("Cannot close statement", e);
-                }
+            log.trace("Get result set");
+            resultSet = preparedStatement.executeQuery();
+            log.trace("Reading groups from DB and add them to Set");
+            while (resultSet.next()) {
+                tempGroup = parseResultSet(resultSet);
+                groups.add(tempGroup);
+                log.trace("Group " + tempGroup.getId() + " added to set");
             }
         } catch (SQLException e) {
             log.warn("Cannot create user", e);
             throw new DAOException("Cannot get all root groups", e);
         } finally {
-            try {
-                connection.close();
-                log.trace("Connection closed");
-            } catch (SQLException e) {
-                log.warn("Cannot close connection", e);
-            }
+            JdbcUtils.closeQuietly(resultSet);
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
         }
         log.trace("Return groups");
         return groups;
@@ -242,50 +162,35 @@ public class PostgreSqlGroupDao implements GroupDao {
         try {
             log.trace("Open connection");
             connection = daoFactory.getConnection();
-            try {
-                log.trace("Create prepared statement");
-                preparedStatement = connection.prepareStatement(sql);
-                preparedStatement.setInt(1, groupId);
+            log.trace("Create prepared statement");
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, groupId);
 
-                try {
-                    log.trace("Get result set");
-                    resultSet = preparedStatement.executeQuery();
-                    log.trace("Reading groups from DB and add them to Set");
-                    while (resultSet.next()) {
-                        tempGroup = new Group(resultSet.getString("group_name"),
-                                resultSet.getInt("group_parent_id"));
-                        tempGroup.setId(resultSet.getInt("id"));
-                        groups.add(tempGroup);
-                        log.trace("Group " + tempGroup.getId() + " added to set");
-                    }
-                } finally {
-                    try {
-                        resultSet.close();
-                        log.trace("result set closed");
-                    } catch (SQLException e) {
-                        log.warn("Cannot close result set", e);
-                    }
-                }
-            } finally {
-                try {
-                    preparedStatement.close();
-                    log.trace("statement closed");
-                } catch (SQLException e) {
-                    log.warn("Cannot close statement", e);
-                }
+            log.trace("Get result set");
+            resultSet = preparedStatement.executeQuery();
+            log.trace("Reading groups from DB and add them to Set");
+            while (resultSet.next()) {
+                tempGroup = parseResultSet(resultSet);
+                groups.add(tempGroup);
+                log.trace("Group " + tempGroup.getId() + " added to set");
             }
+
         } catch (SQLException e) {
             log.warn("Cannot create user", e);
             throw new DAOException("Cannot get all root groups", e);
         } finally {
-            try {
-                connection.close();
-                log.trace("Connection closed");
-            } catch (SQLException e) {
-                log.warn("Cannot close connection", e);
-            }
+            JdbcUtils.closeQuietly(resultSet);
+            JdbcUtils.closeQuietly(preparedStatement);
+            JdbcUtils.closeQuietly(connection);
         }
         log.trace("Return groups");
         return groups;
+    }
+
+    private Group parseResultSet(ResultSet resultSet) throws SQLException {
+        log.trace("Create group to add to the list");
+        Group group = new Group(resultSet.getString("group_name"), resultSet.getInt("group_parent_id"));
+        group.setId(resultSet.getInt("id"));
+        return group;
     }
 }

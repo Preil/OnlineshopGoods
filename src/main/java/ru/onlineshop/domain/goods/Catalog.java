@@ -9,10 +9,10 @@ import ru.onlineshop.dao.GroupDao;
 
 
 public class Catalog extends AbstractGroup {
+
     private DaoFactory daoFactory = DaoFactory.getInstance();
     private GroupDao groupDao = daoFactory.getGroupDao();
 	private static Catalog catalog;
-
 	private static Logger log = Logger.getLogger(Catalog.class.getName());
 	
 	private Catalog() {

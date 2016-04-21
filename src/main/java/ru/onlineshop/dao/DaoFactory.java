@@ -10,13 +10,13 @@ import org.apache.log4j.Logger;
 import ru.onlineshop.dao.postgres.*;
 
 public class DaoFactory {
+
 	private static DaoFactory daoFactory;
 	private static String type;
 	private String user;
 	private String password;
 	private String url;
 	private String driver;
-
 	private static Logger log = Logger.getLogger(DaoFactory.class.getName());
 
 	private DaoFactory() {
