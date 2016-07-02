@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import ru.onlineshop.dao.exception.DAOException;
+import ru.onlineshop.dao.exception.NoDBPropertiesException;
 import ru.onlineshop.dao.postgres.*;
 
 public class DaoFactory {
@@ -28,7 +30,7 @@ public class DaoFactory {
 			log.error("Driver not found\n", e);
 		}
 	}
-	
+
 	public static DaoFactory getInstance() {
 		if (null == daoFactory) {
 			daoFactory = new DaoFactory();

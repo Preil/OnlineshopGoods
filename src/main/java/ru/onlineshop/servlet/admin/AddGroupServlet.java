@@ -1,6 +1,6 @@
 package ru.onlineshop.servlet.admin;
 
-import ru.onlineshop.dao.DAOException;
+import ru.onlineshop.dao.exception.DAOException;
 import ru.onlineshop.domain.ShopManager;
 import ru.onlineshop.domain.exception.AuthorizationException;
 import ru.onlineshop.servlet.ShopManagerHandler;

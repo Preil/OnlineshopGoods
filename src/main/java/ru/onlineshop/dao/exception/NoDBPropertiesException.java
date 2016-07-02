@@ -1,4 +1,4 @@
-package ru.onlineshop.dao;
+package ru.onlineshop.dao.exception;
 
 @SuppressWarnings("serial")
 public class NoDBPropertiesException extends RuntimeException {

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import ru.onlineshop.dao.*;
+import ru.onlineshop.dao.exception.DAOException;
 import ru.onlineshop.domain.exception.AuthorizationException;
 import ru.onlineshop.domain.exception.EmptyCartException;
 import ru.onlineshop.domain.exception.NoOrderFoundException;
@@ -407,7 +408,7 @@ public class ShopManagerImpl implements ShopManager {
 
 	@Override
 	public void deleteGoods(int goodsId) throws DAOException, AuthorizationException {
-	    if (null == currentCustomer) {
+		if (null == currentCustomer) {
 			log.trace("Not logged in");
 			throw new AuthorizationException("You need to authorized first");
 		}
@@ -416,7 +417,7 @@ public class ShopManagerImpl implements ShopManager {
 			throw new AuthorizationException("Only administrator can do this =P");
 		}
 		goodsManager.deleteGoods(goodsId);
-		
+
 	}
 
 	@Override
@@ -430,9 +431,9 @@ public class ShopManagerImpl implements ShopManager {
 			throw new AuthorizationException("Only administrator can do this =P");
 		}
 		goodsManager.deleteGroup(groupId);
-		
+
 	}
-	
+
 	@Override
 	public int getId() {
 		return id;

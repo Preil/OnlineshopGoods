@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import ru.onlineshop.dao.DAOException;
+import ru.onlineshop.dao.exception.DAOException;
 import ru.onlineshop.dao.DaoFactory;
 import ru.onlineshop.dao.GroupDao;
 import ru.onlineshop.domain.goods.Group;

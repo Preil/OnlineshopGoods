@@ -1,6 +1,6 @@
 package ru.onlineshop.servlet.user;
 
-import ru.onlineshop.dao.DAOException;
+import ru.onlineshop.dao.exception.DAOException;
 import ru.onlineshop.domain.ShopManager;
 import ru.onlineshop.domain.exception.AuthorizationException;
 import ru.onlineshop.domain.order.OrderLine;
@@ -20,15 +20,14 @@ public class ShoppingCartManager extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 		String action = request.getParameter("action");
 		String goodsIdString = request.getParameter("id");
 		String orderLineIdString = request.getParameter("orderlineid");
 		int shopManagerId = (Integer) request.getSession().getAttribute("shopmanagerid");
+
 		try {
 			ShopManager shopManager = ShopManagerHandler.getShopManagerById(shopManagerId);
-
 			if (action.equals("order")) {
 				boolean isFound = false;
 				int goodsId = Integer.parseInt(goodsIdString);
@@ -50,7 +49,6 @@ public class ShoppingCartManager extends HttpServlet {
 			}
 		} catch (DAOException | AuthorizationException e) {
 		}
-		
 	}
 
 }

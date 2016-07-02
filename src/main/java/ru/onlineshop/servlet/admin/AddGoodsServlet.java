@@ -1,6 +1,6 @@
 package ru.onlineshop.servlet.admin;
 
-import ru.onlineshop.dao.DAOException;
+import ru.onlineshop.dao.exception.DAOException;
 import ru.onlineshop.domain.ShopManager;
 import ru.onlineshop.domain.exception.AuthorizationException;
 import ru.onlineshop.servlet.ShopManagerHandler;
@@ -24,13 +24,13 @@ public class AddGoodsServlet extends HttpServlet {
 		int price = Math.round(Float.parseFloat(request.getParameter("price"))*100);
 		int amount = Integer.parseInt(request.getParameter("amount"));
 		int shopManagerId = (Integer) request.getSession().getAttribute("shopmanagerid");
-		
+
 		ShopManager shopManager = ShopManagerHandler.getShopManagerById(shopManagerId);
 		try {
-            int groupId = 0;
-            if (null != shopManager.getCatalog().getGroup(groupName)){
-                groupId = shopManager.getCatalog().getGroup(groupName).getId();
-            }
+			int groupId = 0;
+			if (null != shopManager.getCatalog().getGroup(groupName)){
+				groupId = shopManager.getCatalog().getGroup(groupName).getId();
+			}
 			shopManager.addGoods(goodsName, price, groupId, amount);
 		} catch (AuthorizationException | DAOException e) {
 			e.printStackTrace();

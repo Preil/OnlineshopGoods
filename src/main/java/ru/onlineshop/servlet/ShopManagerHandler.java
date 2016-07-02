@@ -6,7 +6,7 @@ import java.util.Set;
 
 
 public class ShopManagerHandler {
-	private static Set<ShopManager> activeShopManagers = new HashSet<ShopManager>();
+	private static Set<ShopManager> activeShopManagers = new HashSet<>();
 
 	public static ShopManager getShopManagerById(int shopmanagerId) {
 		for (ShopManager shopManager : activeShopManagers) {

@@ -19,8 +19,7 @@ public class Order {
 
 	private static Logger log = Logger.getLogger(ShopManagerImpl.class.getName());
 
-	public Order(int customerId, String deliveryAddress, ShippingType shippingType,
-			List<OrderLine> goods) {
+	public Order(int customerId, String deliveryAddress, ShippingType shippingType, List<OrderLine> goods) {
 		this.customerId = customerId;
 		this.deliveryAddress = deliveryAddress;
 		this.shippingType = shippingType;

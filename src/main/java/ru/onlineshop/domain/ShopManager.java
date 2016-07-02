@@ -1,6 +1,6 @@
 package ru.onlineshop.domain;
 
-import ru.onlineshop.dao.DAOException;
+import ru.onlineshop.dao.exception.DAOException;
 import ru.onlineshop.domain.exception.AuthorizationException;
 import ru.onlineshop.domain.exception.EmptyCartException;
 import ru.onlineshop.domain.exception.NoOrderFoundException;
@@ -11,12 +11,11 @@ import ru.onlineshop.domain.goods.Group;
 import ru.onlineshop.domain.order.Order;
 import ru.onlineshop.domain.order.OrderLine;
 import ru.onlineshop.domain.order.ShippingType;
-
 import java.util.List;
 
 
-
 public interface ShopManager {
+
 	Customer createAccount(String login, String password, String name, String email) throws DAOException;
 
 	Customer authorization(String login, String password) throws DAOException;

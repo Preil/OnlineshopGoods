@@ -1,6 +1,6 @@
-package ru.onlineshop.dao;
+package ru.onlineshop.dao.exception;
 
-@SuppressWarnings("serial")
+
 public class DAOException extends Exception {
 
 	public DAOException() {

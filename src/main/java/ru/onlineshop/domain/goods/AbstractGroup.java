@@ -1,6 +1,6 @@
 package ru.onlineshop.domain.goods;
 
-import ru.onlineshop.dao.DAOException;
+import ru.onlineshop.dao.exception.DAOException;
 import ru.onlineshop.dao.DaoFactory;
 import ru.onlineshop.dao.GroupDao;
 

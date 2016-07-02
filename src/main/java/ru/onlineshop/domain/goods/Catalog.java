@@ -3,7 +3,7 @@ package ru.onlineshop.domain.goods;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import ru.onlineshop.dao.DAOException;
+import ru.onlineshop.dao.exception.DAOException;
 import ru.onlineshop.dao.DaoFactory;
 import ru.onlineshop.dao.GroupDao;
 

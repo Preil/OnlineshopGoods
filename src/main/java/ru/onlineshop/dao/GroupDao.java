@@ -1,5 +1,6 @@
 package ru.onlineshop.dao;
 
+import ru.onlineshop.dao.exception.DAOException;
 import ru.onlineshop.domain.goods.Group;
 
 import java.util.List;
