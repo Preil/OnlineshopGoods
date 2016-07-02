@@ -16,7 +16,7 @@ public class Customer {
 	private String phone;
 	private String email;
 	private String creditCardInfo = "";
-	private List<Order> orders = new ArrayList<Order>();
+	private List<Order> orders = new ArrayList<>();
 
 	private static Logger log = Logger.getLogger(Customer.class.getName());
 

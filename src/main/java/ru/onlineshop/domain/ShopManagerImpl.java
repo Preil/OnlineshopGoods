@@ -82,10 +82,7 @@ public class ShopManagerImpl implements ShopManager {
 
 	@Override
 	public boolean isLogedIn() {
-		if (null == currentCustomer) {
-			return false;
-		}
-		return true;
+		return null != currentCustomer;
 	}
 
 	@Override

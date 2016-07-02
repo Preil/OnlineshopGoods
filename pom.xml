@@ -8,7 +8,8 @@
   <name>onlineshop Maven Webapp</name>
   <url>http://maven.apache.org</url>
 
-  <dependencies>
+  <!--suppress MavenDuplicateDependenciesInspection, MavenDuplicateDependenciesInspection -->
+    <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

@@ -19,7 +19,7 @@ public class ShoppingCart {
 	public ShoppingCart(Customer customer) {
 		this.id = ++count;
 		this.customer = customer;
-		this.goodlLines = new ArrayList<OrderLine>();
+		this.goodlLines = new ArrayList<>();
 		log.trace("Created new shopping cart, id=" + id);
 	}
 

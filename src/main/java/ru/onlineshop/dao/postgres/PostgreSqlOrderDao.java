@@ -12,7 +12,6 @@ import org.apache.log4j.Logger;
 import ru.onlineshop.dao.exception.DAOException;
 import ru.onlineshop.dao.DaoFactory;
 import ru.onlineshop.dao.OrderDao;
-import ru.onlineshop.domain.goods.Group;
 import ru.onlineshop.domain.order.Order;
 import ru.onlineshop.domain.order.OrderLine;
 import ru.onlineshop.domain.order.OrderStatus;

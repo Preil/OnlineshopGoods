@@ -8,10 +8,11 @@ import java.util.List;
 
 
 public interface OrderDao {
-	public Order create(int customerId, String deliveryAddress, ShippingType shippingType) throws DAOException;
 
-	public Order read(int id) throws DAOException;
+	Order create(int customerId, String deliveryAddress, ShippingType shippingType) throws DAOException;
 
-	public List<Order> getAll(int customerId) throws DAOException;
+	Order read(int id) throws DAOException;
+
+	List<Order> getAll(int customerId) throws DAOException;
 
 }

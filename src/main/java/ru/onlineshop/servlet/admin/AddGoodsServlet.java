@@ -28,6 +28,7 @@ public class AddGoodsServlet extends HttpServlet {
 		ShopManager shopManager = ShopManagerHandler.getShopManagerById(shopManagerId);
 		try {
 			int groupId = 0;
+			assert shopManager != null;
 			if (null != shopManager.getCatalog().getGroup(groupName)){
 				groupId = shopManager.getCatalog().getGroup(groupName).getId();
 			}
